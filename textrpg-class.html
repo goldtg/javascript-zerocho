@@ -93,8 +93,13 @@
           this.createMonster();
         } else if (input === '2') {
           //휴식
+          this.hero.hp = this.hero.maxHp;
+          this.updateHeroStat();
+          this.showMessage(`충분한 휴식을 취했다.`);
+
         } else if (input === '3') {
           //종료
+          showMessage('');
           this.quit();
         }
       }
@@ -103,7 +108,7 @@
         const input = event.target['battle-input'].value;
         if (input === '1') {
           //공격
-          const { hero, monster} = this;
+          const { hero, monster } = this;
           hero.attack(monster);
           monster.attack(hero);
           this.showMessage(`${hero.att}의 데미지를 주고, ${monster.att}의 데미지를 받았다.`);
@@ -122,9 +127,17 @@
           }
         } else if (input === '2') {
           //회복
+          const { hero, monster} = this;
+          hero.hp = Math.min(hero.maxHp, hero.hp + 20);
+          monster.attack(hero);
+          this.updateHeroStat();
+          this.showMessage('쳐력 회복');
         } else if (input === '3') {
           //도망
           this.changeScreen('game');
+          this.showMessage('도망');
+          this.monster = null;
+          this.updateMonsterStat();
         }
       }
       updateHeroStat() {
@@ -201,10 +214,6 @@
       constructor(game, name) {
         super(game, name, 100, 10, 0);
         this.lev = 1;
-      }
-      heal(monster) {
-        this.hp += 20;
-        this.hp -= monster.att;
       }
       getXp(xp) {
         this.xp += xp;
