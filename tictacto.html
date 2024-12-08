@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>틱택토</title>
+<style>
+table {
+  border-collapse: collapse;
+}
+td {
+  border: 1px solid black;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+  <script>
+    const { body } = document;
+    const $table = document.createElement('table');
+    const $result = document.createElement('div');
+    const rows = [];  
+    let turn = 'O';
+
+    const checkWinner = (target) => {
+      // target은 td 태그이다.
+      let rowIndex = target.parentNode.rowIndex
+      let cellIndex = target.cellIndex
+
+      rows.forEach((row, ri) => {
+        row.forEach((cell, ci) => {
+          if (cell === target) {
+            rowIndex = ri;
+            cellIndex = ci;
+          }
+        })
+      })
+      //세칸 다 채워졌나
+      let hasWinner = false;
+      //가로줄 검사
+    if (rows[rowIndex][0].textContent === turn &&
+      rows[rowIndex][1].textContent === turn &&
+      rows[rowIndex[2].textContent === turn]
+    ) {
+      hasWinner = true;
+    } 
+    //세로줄 검사
+    if (rows[0][cellIndex].textContent === turn &&
+      rows[1][cellIndex].textContent === turn &&
+      rows[2][cellIndex].textContent === turn ) {
+        hasWinner = true;
+      }
+    //대각선 검사
+    if (rows[0][0].textContent === turn &&
+      rows[1][1].textContent === turn &&
+      rows[2][2].textContent === turn) {
+        hasWinner = true;
+      }
+    if (rows[0][2].textContent === turn &&
+    rows[1][1].textContent === turn &&
+    rows[2][0].textContent === turn) {
+      hasWinner = true;
+    }
+    return hasWinner;
+  }
+    
+    body.append($table);
+
+    const callback = (event) => {
+      if (event.target.textContent !== '') {
+        console.log('빈칸이 아닙니다');
+        return ;
+      }
+      console.log ('빈칸 입니다.');
+      event.target.textContent = turn;
+      // 칸에 글자가 있나?
+
+      
+      if (checkWinner(event.target)) {
+        $result.textContent = `${turn} 님의 승리`;
+        $table.removeEventListener('click', callback);
+        return ;
+      };
+      
+      //무승부 검사
+  
+      const draw = rows.flat().every((cell) => cell.textContent);
+
+      // 함수는 기본적으로 return undefined를 한다. => 그래서 함수 반복문은 멈추지 않음;
+      if (draw){
+        $result.textContent = `무승부!`;
+        return ;
+      }
+      if (turn === 'O') {
+        turn = 'X';
+      } else if (turn === 'X') {
+        turn = 'O';
+      }
+    }
+    
+    for(let i = 0; i < 3; i++) {
+      const $tr = document.createElement('tr');
+      const cells = [];
+      for (let j = 0; j < 3; j++) {
+        const $td = document.createElement('td');
+        cells.push($td);
+        $tr.append($td);
+      }
+      rows.push(cells)
+      $table.append($tr);
+    }
+    $table.addEventListener('click', callback);
+    body.append($table);
+    body.append($result);
+  </script>
+</body>
