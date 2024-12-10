@@ -43,9 +43,10 @@
 <script>
 const $wrapper = document.querySelector('#wrapper');
 
-const total = 12;
-const colors = ['red', 'orange', 'yellow', 'green', 'white', 'pink'];
-let colorCopy = colors.concat(colors); // 같은 거 두 개 합쳐서 만들기
+const total = parseInt(prompt('카드 수를 짝수로 입력하세요(최대 20).'));
+const colors = ['red', 'orange', 'yellow', 'green', 'white', 'pink', 'cyan', 'violet','gray','black'];
+let colorSlice = colors.slice(0, total/2);
+let colorCopy = colorSlice.concat(colorSlice); // 같은 거 두 개 합쳐서 만들기
 let shuffled = [];
 let clicked = []; //클릭한 카드배열
 let completed = [] // 이미 맞춘 배열
@@ -95,11 +96,10 @@ function onClickCard () {
     if (completed.length !==total) {
       return;
     }
-    endTime = Date().now;
-    totalTime = startTime - endTime;
     console.log(totalTime);
+    endTime = new Date();
     setTimeout(() => {
-      alert('축하합니다');
+      alert(`축하합니다. ${(endTime- startTime) / 1000} 초 걸렸습니다.`);
     }, 1000);
     return ;
   } else if (front1Color !== front2Color) { // 두 카드 색이 다르면
@@ -114,7 +114,6 @@ function onClickCard () {
 } 
 function startGame () {
   shuffle();
-  startTime = Date().now;
   for (let i = 0; i < total; i++) {
     const card = createCard(i);
     $wrapper.appendChild(card);
@@ -130,11 +129,12 @@ function startGame () {
       card.classList.remove('flipped');
     });
     clickable = true;
+    startTime = new Date();
   }, 5000);
 }
 function resetGame() {
   $wrapper.innerHTML = '';
-  colorCopy = colors.concat(colors);
+  colorCopy = colorSlice.concat(colorSlice);
   shuffled = [];
   completed = [];
   clickable = false;
