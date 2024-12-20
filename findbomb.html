@@ -19,11 +19,13 @@ td.question { background: orange; }
 </style>
 </head>
 <body>
+  <div id="timer"> 0초 </div>
 <table id="table">
   <tbody></tbody>
 </table>
 <div id="result"></div>
 <script>
+  const $timer = document.querySelector('#timer')
   const $tbody = document.querySelector('#table tbody');
   const $result = document.querySelector('#result');
   // const $tr = document.createElement('tr');
@@ -42,6 +44,12 @@ td.question { background: orange; }
     OPENED: 0 // 0 이상이면 열린 칸
   }
   let data;
+  let openCount = 0;
+  let startTime = new Date();
+  const interval = setInterval(() => {
+    const time = Math.floor((new Date() - startTime) / 1000);
+    $timer.textContent = `${time}초`;
+  }, 1000);
 
   function planMine () {
     const candidate = Array(row * cell).fill().map((arr, i) => {
@@ -83,14 +91,30 @@ td.question { background: orange; }
   }
 
   function open(rowIndex, cellIndex) {
+    if(data[rowIndex]?.[cellIndex] >= CODE.OPENED) return;
     const target = $tbody.children[rowIndex]?.children[cellIndex];
     if (!target) {
       return;
     }
+    if (data[rowIndex][cellIndex] === CODE.MINE 
+        || data[rowIndex][cellIndex] === CODE.FLAG_MINE 
+        || data[rowIndex][cellIndex] === CODE.QUESTION_MINE) {
+        return;}
     const count = countMine(rowIndex,cellIndex);
     target.textContent = count ?? '';
     target.className = 'opened';
     data[rowIndex][cellIndex] = count;
+    openCount++;
+    console.log(openCount);
+    if (openCount === row * cell - mine) {
+      const time = (new Date() - startTime) / 1000;
+      clearInterval(interval);
+      $tbody.removeEventListener('contextmenu', onRightClick);
+      $tbody.removeEventListener('click', onLeftClick);
+      setTimeout(() => {
+        alert(`승리했습니다! ${time}초가 걸렸습니다.`)
+      }, 0) // 화면이 바뀔 수 있는 시간 주기
+    }
     return count;
   }
 
@@ -106,9 +130,7 @@ td.question { background: orange; }
       openAround(rI + 1, cI -1);
       openAround(rI + 1, cI);
       openAround(rI + 1, cI +1);
-    }, 0); 
-     {
-    }
+    }, 0);
   }
 
   function onRightClick (event) {
@@ -166,6 +188,7 @@ td.question { background: orange; }
       // ~펑
       target.textContent = '펑';
       target.className = 'opened';
+      clearInterval(interval);
       $tbody.removeEventListener('contextmenu', onRightClick);
       $tbody.removeEventListener('click', onLeftClick);
       // //나머지는 무시
