@@ -1,48 +1,49 @@
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
     <div><span id="order">1</span>번째 사람</div>
     <div>제시어: <span id="word"></span></div>
-    <input type="text"> <button>입력</button>
+    <input type="text" /> <button>입력</button>
     <script>
-        let number = prompt("몇 명?");
-        if(number !== null) {
-            let word;
-            let newWord;
-            let order;
-            let $order = document.querySelector('#order');
-            let $word = document.querySelector('#word');
-            let $input = document.querySelector('input');
-            const $button = document.querySelector('button');
-            const onClickButton = () => {
-            if(!word || (word[word.length - 1] === newWord[0] && newWord.length === 3)) {
-                word = newWord;
-                $word.textContent = word;
-                $input.value = '';
-                $input.focus();
-                order = Number($order.textContent);
+      let number = prompt('몇 명?');
+      if (number !== null) {
+        let word;
+        let newWord;
+        let order;
+        let $order = document.querySelector('#order');
+        let $word = document.querySelector('#word');
+        let $input = document.querySelector('input');
+        const $button = document.querySelector('button');
+        const onClickButton = () => {
+          if (
+            !word ||
+            (word[word.length - 1] === newWord[0] && newWord.length === 3)
+          ) {
+            word = newWord;
+            $word.textContent = word;
+            $input.value = '';
+            $input.focus();
+            order = Number($order.textContent);
 
-                if(order + 1 > number){
-                    $order.textContent = 1;
-                }
-                else{
-                    $order.textContent = order + 1;
-                }
+            if (order + 1 > number) {
+              $order.textContent = 1;
+            } else {
+              $order.textContent = order + 1;
             }
-            else{
-                alert('종료');
-            }
-        }
+          } else {
+            alert('종료');
+          }
+        };
         const onInput = () => {
-            newWord = event.target.value;
-        }
+          newWord = event.target.value;
+        };
         $button.addEventListener('click', onClickButton);
         $input.addEventListener('input', onInput);
-    }
+      }
     </script>
-</body>
+  </body>
 </html>
