@@ -19,6 +19,12 @@ td.question { background: orange; }
 </style>
 </head>
 <body>
+  <form id="form">
+    <input placeholder="가로줄" id="row", size="5" />
+    <input placeholder="세로줄" id="cell", size="5" />
+    <input placeholder="지뢰" id="mine", size="5" />
+    <button>생성</button>
+  </form>
   <div id="timer"> 0초 </div>
 <table id="table">
   <tbody></tbody>
@@ -28,12 +34,17 @@ td.question { background: orange; }
   const $timer = document.querySelector('#timer')
   const $tbody = document.querySelector('#table tbody');
   const $result = document.querySelector('#result');
+  const $form = document.querySelector('#form ')
+  const $row = document.querySelector('#row');
+  const $cell = document.querySelector('#cell');
+  const $mine = document.querySelector('#mine');
+
   // const $tr = document.createElement('tr');
   // const $td = document.createElement('td');
 
-  let row = 10;
-  let cell = 10;
-  let mine = 10;
+  let row ;
+  let cell ;
+  let mine ;
   const CODE = {
     NORMAL: -1,
     QUESTION: -2,
@@ -44,12 +55,30 @@ td.question { background: orange; }
     OPENED: 0 // 0 이상이면 열린 칸
   }
   let data;
-  let openCount = 0;
+  let openCount;
   let startTime = new Date();
-  const interval = setInterval(() => {
+  let interval = setInterval(() => {
     const time = Math.floor((new Date() - startTime) / 1000);
     $timer.textContent = `${time}초`;
   }, 1000);
+
+  $form.addEventListener('submit', onSubmit);
+
+  function onSubmit(event) {
+    event.preventDefault();
+    row = parseInt(event.target.row.value);
+    cell = parseInt(event.target.cell.value);
+    mine = parseInt(event.target.mine.value);
+    $tbody.textContent = '';
+    clearInterval(interval);
+    drawTable();
+    openCount = 0;
+    startTime = new Date();
+    interval = setInterval(() => {
+      const time = Math.floor((new Date() - startTime) / 1000);
+      $timer.textContent = `${time}초`;
+    }, 1000);
+  }
 
   function planMine () {
     const candidate = Array(row * cell).fill().map((arr, i) => {
@@ -121,7 +150,7 @@ td.question { background: orange; }
   function openAround(rI, cI) {
     setTimeout(() => {
       const count = open(rI, cI);
-      if (count === 0)
+      if (count === 0) {
       openAround(rI - 1, cI -1);
       openAround(rI - 1, cI);
       openAround(rI - 1, cI + 1);
@@ -130,6 +159,7 @@ td.question { background: orange; }
       openAround(rI + 1, cI -1);
       openAround(rI + 1, cI);
       openAround(rI + 1, cI +1);
+    }
     }, 0);
   }
 
@@ -153,7 +183,7 @@ td.question { background: orange; }
       //깃발 지뢰면
       data[rowIndex][cellIndex] = CODE.MINE
       target.className = '';
-      target.textContent ='X';
+      // target.textContent ='X';
     } else if (cellData === CODE.NORMAL) {
       //닫힌 칸이면
       data[rowIndex][cellIndex] = CODE.QUESTION;
@@ -195,7 +225,7 @@ td.question { background: orange; }
     }
     //아무동작 안하기
   }
-
+  let dev =false;
   function drawTable() {
     data = planMine();
     data.forEach((row) => {
@@ -203,16 +233,16 @@ td.question { background: orange; }
       row.forEach((cell) => {
         const $td = document.createElement('td')
           if (cell === CODE.MINE){ 
-            $td.textContent ='X';
+            //dev && $td.textContent ='X';
           }
           $tr.append($td);
       });
       $tbody.append($tr);
-      $tbody.addEventListener('contextmenu', onRightClick);
-      $tbody.addEventListener('click', onLeftClick);
     });
+    $tbody.addEventListener('contextmenu', onRightClick);
+    $tbody.addEventListener('click', onLeftClick); // 이벤트 리스너가 한번만 추가되어야 좋음 -> 반복문에 들어가 있으면 화면에 시간 표기에 오류 발생
   }
-  drawTable();
+  // drawTable();
 
 </script>
 </body>
