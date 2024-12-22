@@ -53,6 +53,30 @@
       let row;
       let cell;
       let mine;
+      let firstClick = true;
+      let searched;
+      let normalCellFound = false;
+
+      function transferMine(rI, cI) {
+        if (normalCellFound) return; //이미 빈칸을 찾았으면 종료
+        if (rI < 0 || rI >= row || cI < 0 || cI >= cell) return;
+        if (searched[rI][cI]) return; //이미 찾은 칸이면 종료
+        if (data[rI]?.[cI] === CODE.NORMAL) {
+          //빈칸인 경우
+          normalCellFound = true;
+          data[rI][cI] = CODE.MINE;
+        } else {
+          searched[rI][cI] = true;
+          transferMine(rI - 1, cI - 1);
+          transferMine(rI - 1, cI);
+          transferMine(rI - 1, cI + 1);
+          transferMine(rI, cI - 1);
+          transferMine(rI, cI + 1);
+          transferMine(rI + 1, cI - 1);
+          transferMine(rI + 1, cI);
+          transferMine(rI + 1, cI + 1);
+        }
+      }
       const CODE = {
         NORMAL: -1,
         QUESTION: -2,
@@ -178,7 +202,16 @@
           }
         }, 0);
       }
-
+      function showMines() {
+        const mines = [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE];
+        data.forEach((row, rowIndex) => {
+          row.forEach((cell, cellIndex) => {
+            if (mines.includes(cell)) {
+              $tbody.children[rowIndex].children[cellIndex].textContent = 'X';
+            }
+          });
+        });
+      }
       function onRightClick(event) {
         event.preventDefault();
         const target = event.target;
@@ -222,7 +255,19 @@
         const target = event.target;
         const rowIndex = target.parentNode.rowIndex;
         const cellIndex = target.cellIndex;
-        const cellData = data[rowIndex][cellIndex];
+        let cellData = data[rowIndex][cellIndex];
+
+        if (firstClick) {
+          firstClick = false;
+          searched = Array(row)
+            .fill()
+            .map(() => []);
+          if (cellData === CODE.MINE) {
+            transferMine(rowIndex, cellIndex);
+            data[rowIndex][cellIndex] = CODE.NORMAL;
+            cellData = CODE.NORMAL;
+          }
+        }
 
         if (cellData === CODE.NORMAL) {
           //닫힌 칸이면
@@ -232,6 +277,7 @@
           // ~펑
           target.textContent = '펑';
           target.className = 'opened';
+          showMines();
           clearInterval(interval);
           $tbody.removeEventListener('contextmenu', onRightClick);
           $tbody.removeEventListener('click', onLeftClick);
